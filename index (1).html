@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Value Synthesis — SCAD Office of Curriculum &amp; Assessment</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.2.0/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f1;
+    --bg3: #eeede9;
+    --tx: #1a1a1a;
+    --tx2: #5f6b7a;
+    --tx3: #9ca3af;
+    --bd: rgba(0,0,0,0.10);
+    --bd2: rgba(0,0,0,0.18);
+    --r: 8px;
+    --rl: 12px;
+    --bg-danger:#fee2e2; --tx-danger:#991b1b;
+    --bg-info:#dbeafe;   --tx-info:#1e3a8a;
+    --bg-warn:#fef3c7;   --tx-warn:#92400e;
+    --bg-ok:#d1fae5;     --tx-ok:#065f46;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    color: var(--tx);
+    background: var(--bg3);
+    padding: 24px 16px;
+    line-height: 1.5;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: var(--tx2); margin-bottom: 20px; }
+  .sum-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+  .metric-card { background: var(--bg); border-radius: var(--r); padding: 12px 14px; border: 0.5px solid var(--bd); }
+  .metric-num { font-size: 28px; font-weight: 500; line-height: 1; margin-bottom: 3px; }
+  .metric-lbl { font-size: 11px; }
+  .pattern-box { background: var(--bg); border: 0.5px solid var(--bd2); border-radius: var(--rl); padding: 14px 16px; margin-bottom: 16px; }
+  .pattern-title { font-size: 11px; font-weight: 500; color: var(--tx2); margin-bottom: 6px; }
+  .pattern-text { font-size: 12px; line-height: 1.65; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .fbtn { padding: 5px 13px; border-radius: 20px; border: 0.5px solid var(--bd2); background: var(--bg); color: var(--tx2); font-size: 12px; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .fbtn:hover { background: var(--bg2); }
+  .fbtn.active { background: var(--tx); color: var(--bg); border-color: var(--tx); }
+  .cc { background: var(--bg); border: 0.5px solid var(--bd); border-radius: var(--rl); margin-bottom: 10px; overflow: hidden; }
+  .ch { padding: 13px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; transition: background .1s; }
+  .ch:hover { background: var(--bg2); }
+  .cbar { width: 3px; border-radius: 2px; align-self: stretch; flex-shrink: 0; }
+  .hc { flex: 1; min-width: 0; }
+  .htop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: var(--r); }
+  .clbl { font-size: 11px; color: var(--tx2); }
+  .cname { font-size: 14px; font-weight: 500; }
+  .cdesc { font-size: 12px; color: var(--tx2); margin-top: 2px; }
+  .hr { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .asc { font-size: 26px; font-weight: 500; line-height: 1; text-align: right; }
+  .albl { font-size: 10px; color: var(--tx3); text-align: right; }
+  .tic { font-size: 18px; color: var(--tx3); width: 20px; text-align: center; }
+  .cb { padding: 4px 14px 16px 27px; border-top: 0.5px solid var(--bd); display: none; }
+  .cb.open { display: block; }
+  .strack { position: relative; height: 24px; margin: 12px 0 3px; }
+  .sbg { position: absolute; top: 11px; left: 0; right: 0; height: 2px; background: var(--bd2); border-radius: 1px; }
+  .savg { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-50%); background: #6b7280; opacity: 0.45; }
+  .sdot { position: absolute; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); top: 6px; border: 1.5px solid #fff; cursor: default; }
+  .slbls { display: flex; justify-content: space-between; font-size: 10px; color: var(--tx3); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 7px; }
+  .li { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--tx2); }
+  .ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .plist { margin: 10px 0; }
+  .pr { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--bd); font-size: 12px; }
+  .pr:last-child { border-bottom: none; }
+  .ptag { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: var(--r); flex-shrink: 0; color: #fff; }
+  .psc { font-size: 13px; font-weight: 500; margin-left: auto; flex-shrink: 0; }
+  .ins { background: var(--bg2); border-left: 2px solid var(--bd2); padding: 8px 12px; border-radius: 0; font-size: 12px; color: var(--tx2); margin: 10px 0; line-height: 1.55; }
+  .fwtags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .fwt { font-size: 11px; padding: 2px 8px; border-radius: var(--r); background: var(--bg2); color: var(--tx2); border: 0.5px solid var(--bd); }
+  .reco { padding: 10px 14px; border-radius: var(--r); font-size: 12px; margin-top: 10px; line-height: 1.65; }
+  .rlbl { font-size: 10px; font-weight: 500; margin-bottom: 5px; }
+  footer { text-align: center; font-size: 11px; color: var(--tx3); margin-top: 24px; padding-top: 16px; border-top: 0.5px solid var(--bd); }
+  @media (max-width: 600px) {
+    .sum-grid { grid-template-columns: repeat(2,1fr); }
+    body { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Task Value Synthesis</h1>
+  <p class="subtitle">SCAD Office of Curriculum &amp; Assessment &nbsp;·&nbsp; 5 staff &nbsp;·&nbsp; 9 task clusters &nbsp;·&nbsp; sorted by action priority</p>
+
+  <div class="sum-grid">
+    <div class="metric-card"><div class="metric-num" style="color:var(--tx-danger);">1</div><div class="metric-lbl" style="color:var(--tx-danger);">Eliminate / automate</div></div>
+    <div class="metric-card"><div class="metric-num" style="color:var(--tx-info);">1</div><div class="metric-lbl" style="color:var(--tx-info);">Structural fix needed</div></div>
+    <div class="metric-card"><div class="metric-num" style="color:var(--tx-warn);">4</div><div class="metric-lbl" style="color:var(--tx-warn);">Redesign / revise</div></div>
+    <div class="metric-card"><div class="metric-num" style="color:var(--tx-ok);">3</div><div class="metric-lbl" style="color:var(--tx-ok);">Protect</div></div>
+  </div>
+
+  <div class="pattern-box">
+    <div class="pattern-title"><i class="ti ti-bulb" aria-hidden="true"></i>&nbsp; Key pattern: the split task problem</div>
+    <div class="pattern-text">The most consistent finding is not which tasks are low-value — it's that the <strong>same clusters split dramatically by role experience</strong>. CourseLeaf: high value (substantive review) vs. lowest value (data entry). Level Up: ranked 2nd by one staff member, 4th of 5 by another. Cross-listing: process ownership (valued) vs. reactive fielding (universally disliked). Before eliminating any task, determine whether the problem is the task itself or how it's distributed.</div>
+  </div>
+
+  <div class="filters">
+    <button class="fbtn active" onclick="go('all',this)">All clusters</button>
+    <button class="fbtn" onclick="go('remove',this)">Eliminate (1)</button>
+    <button class="fbtn" onclick="go('structural',this)">Structural fix (1)</button>
+    <button class="fbtn" onclick="go('revise',this)">Redesign (4)</button>
+    <button class="fbtn" onclick="go('protect',this)">Protect (3)</button>
+  </div>
+
+  <div id="clist"></div>
+
+  <footer>Scores normalized 0–100 across each staff member's list length. Vertical line = group average. Colored dots = individual staff.</footer>
+</div>
+
+<script>
+/* ── DATA ───────────────────────────────────────────────────────────────────
+   To update: edit CLUSTERS below, then open index.html in any browser.
+   Each cluster has: id, name, desc, action, con(sensus), items[], ins(ight),
+   fw(frameworks)[], reco(mmendation).
+   
+   Item scores: normalized 0–100 where 100 = most valued.
+   Formula: ((total_items - rank) / (total_items - 1)) * 100, rounded.
+   
+   Staff list sizes: P1=5, P2=5, P3=5, P4=5, P5=7
+────────────────────────────────────────────────────────────────────────── */
+const CLUSTERS = [
+  {
+    id:'banner',
+    name:'Banner & system error correction',
+    desc:'Fixing errors, updating catalog data, processing scheduling requests',
+    action:'remove', con:'low',
+    items:[
+      {p:'P2', l:'Editing / fixing Banner errors',                   s:50},
+      {p:'P4', l:'Updating catalog info in CourseLeaf',              s:0},
+      {p:'P5', l:'Banner updates / fixing errors / scheduling',      s:0}
+    ],
+    ins:null,
+    fw:['Value stream: rework / non-value-adding','Admin burden: high compliance + psychological cost'],
+    reco:'Error correction is a symptom of upstream process failure, not a legitimate standing task. Audit where errors originate: is this a training gap, a permissions issue, or a workflow handoff problem? Each has a different fix. The goal is closure, not management.'
+  },
+  {
+    id:'friction',
+    name:'Low-value meetings & dependency friction',
+    desc:'Purposeless meetings, waiting on decisions, working around disengagement',
+    action:'structural', con:'low',
+    items:[
+      {p:'P1', l:'Meetings that do not accomplish purpose',           s:25},
+      {p:'P2', l:'Waiting on others to make decisions',              s:25},
+      {p:'P1', l:'Working with non-change-seeking colleagues',       s:0}
+    ],
+    ins:null,
+    fw:['JD-R: pure demand / no resource','SDT: autonomy thwarted'],
+    reco:'These are not tasks to eliminate — they are symptoms. Purposeless meetings signal a lack of agenda norms or unclear meeting purpose. Decision dependency signals unclear authority or escalation paths. The disengagement comment warrants a direct leadership conversation separate from any workload redesign effort.'
+  },
+  {
+    id:'crosslist',
+    name:'Cross-listing & prerequisite management',
+    desc:'Processing requests, fielding ad hoc inquiries, managing exceptions',
+    action:'revise', con:'divergent',
+    items:[
+      {p:'P2', l:'Making suggestions for cross listing',             s:0},
+      {p:'P3', l:'External inquiries incl. cross-list',             s:0},
+      {p:'P5', l:'Cross-listing processes',                         s:67},
+      {p:'P5', l:'Prerequisite questions',                          s:33}
+    ],
+    ins:'P5 owns the process (ranked 3rd). P2 and P3 are fielding reactive inquiries generated by it and rank it last. Same work, entirely different role experience.',
+    fw:['Job crafting: task boundary issue','Admin burden: learning + compliance costs'],
+    reco:'The process management work has value; the reactive fielding does not. Create documentation or self-service guidance that reduces ad hoc inquiries landing on P2 and P3. Clarify who owns routing decisions and who is currently absorbing overflow due to unclear ownership.'
+  },
+  {
+    id:'assess',
+    name:'Assessment administration',
+    desc:'Creating survey links, distributing, email follow-up, sending reminders',
+    action:'revise', con:'divergent',
+    items:[
+      {p:'P1', l:'Assessment point surveys',                        s:75},
+      {p:'P3', l:'Assessment survey links',                         s:50},
+      {p:'P4', l:'Creating assessment links',                       s:50},
+      {p:'P5', l:'Assessment links & email follow-up',             s:50},
+      {p:'P5', l:'Reminders for assessment / curriculum',           s:17}
+    ],
+    ins:'P1 values this 25+ points higher than others — likely reflects ownership vs. execution. The task may feel meaningful when you design the process and routine when you are running it.',
+    fw:['Admin burden: compliance costs','JD-R: high demand / low resource'],
+    reco:'Separate strategic assessment work (designing instruments, interpreting results) from mechanical execution (building links, sending reminders). The former belongs in skilled hands. The latter is a strong automation or workflow candidate — Anthology Evaluate addresses this directly.'
+  },
+  {
+    id:'email',
+    name:'Email as decision channel',
+    desc:'Using email for decisions, managing general inbox volume',
+    action:'revise', con:'divergent',
+    items:[
+      {p:'P2', l:'Decision-making via email',                       s:75},
+      {p:'P4', l:'Answering emails',                                s:25}
+    ],
+    ins:'P2 values email as a documented async decision channel. P4 experiences it as volume. These are different problems with different solutions.',
+    fw:['Admin burden: compliance costs','JD-R: communication channel mismatch'],
+    reco:"Distinguish high-value async communication (documented decisions, stakeholder alignment) from inbox noise. Identify recurring email categories that could be handled via self-service resources, response templates, or a shared inbox. P2's preference suggests any solution should preserve the documentation function, not eliminate async communication altogether."
+  },
+  {
+    id:'levelup',
+    name:'Level Up & assessment initiatives',
+    desc:'Level Up program, Use of Results reporting, initiative-driven assessment work',
+    action:'revise', con:'divergent',
+    items:[
+      {p:'P3', l:'Level Up and Use of Results',                     s:25},
+      {p:'P5', l:'Level Up / course visitation / insights',         s:83}
+    ],
+    ins:"58-point gap for the same initiative. P5's high ranking likely reflects course-level engagement and synthesis work. P3's lower ranking may reflect the administrative and coordination overhead side of implementation.",
+    fw:['Job crafting: role boundary difference','JCM: task identity varies by role'],
+    reco:"Examine whether the high-engagement work (observation, synthesis, follow-up) is distributed fairly or concentrated in one role. If P3's experience of Level Up is primarily logistical coordination while P5's is analytical and relational, the initiative's division of labor — not the initiative itself — needs adjustment."
+  },
+  {
+    id:'curriculum',
+    name:'Substantive curriculum review',
+    desc:'Reviewing proposed changes, evaluating academic content in CourseLeaf',
+    action:'protect', con:'high',
+    items:[
+      {p:'P3', l:'CourseLeaf (substantive work)',                   s:75},
+      {p:'P4', l:'Reviewing proposed curriculum changes',           s:75}
+    ],
+    ins:'P4 ranks substantive review 2nd and catalog data entry 5th — same system, opposite experiences. These must not be conflated in role design.',
+    fw:['JCM: task identity + significance','SDT: competence'],
+    reco:'Protect and keep this work visible in how you describe and measure the role. Separate it explicitly from catalog maintenance — same system, fundamentally different activities. Conflating them in job descriptions or workload conversations obscures what staff actually find meaningful.'
+  },
+  {
+    id:'meetings',
+    name:'Purposeful stakeholder meetings',
+    desc:'Department meetings, dean/chair engagement with clear purpose and outcome',
+    action:'protect', con:'high',
+    items:[
+      {p:'P3', l:'Department meetings',                             s:100},
+      {p:'P4', l:'Meetings with chairs / deans',                   s:100}
+    ],
+    ins:null,
+    fw:['SDT: relatedness','JCM: skill variety + significance'],
+    reco:"Protect. Consistently ranked first by the staff who listed them. Ensure these are not crowded out by administrative overhead. The word 'meeting' spans both ends of the value scale depending entirely on whether purpose is clear — contrast with low-value meetings cluster."
+  },
+  {
+    id:'strategic',
+    name:'Strategic & cognitive work',
+    desc:'High-order thinking, project ownership, building consensus',
+    action:'protect', con:'high',
+    items:[
+      {p:'P1', l:'Project management',                              s:100},
+      {p:'P2', l:'Building consensus',                              s:100},
+      {p:'P5', l:'Processing and thinking',                         s:100}
+    ],
+    ins:null,
+    fw:['SDT: autonomy + competence','JCM: task significance'],
+    reco:"These are your team's primary intrinsic motivators — unanimously ranked first by every staff member who listed them. Audit how much actual work time is spent here versus lower-value tasks. The gap between ideal and actual is likely larger than expected and worth making visible."
+  }
+];
+
+/* ── CONFIG (edit to change colors/labels) ──────────────────────────────── */
+const PC = {P1:'#378ADD', P2:'#7F77DD', P3:'#1D9E75', P4:'#D85A30', P5:'#BA7517'};
+const AS = {
+  remove:     {label:'Eliminate / automate', bar:'#E24B4A', bbg:'var(--bg-danger)', bc:'var(--tx-danger)', rb:'var(--bg-danger)', rc:'var(--tx-danger)'},
+  structural: {label:'Structural fix needed',bar:'#378ADD', bbg:'var(--bg-info)',   bc:'var(--tx-info)',   rb:'var(--bg-info)',   rc:'var(--tx-info)'},
+  revise:     {label:'Redesign',             bar:'#EF9F27', bbg:'var(--bg-warn)',   bc:'var(--tx-warn)',   rb:'var(--bg-warn)',   rc:'var(--tx-warn)'},
+  protect:    {label:'Protect',              bar:'#639922', bbg:'var(--bg-ok)',     bc:'var(--tx-ok)',     rb:'var(--bg-ok)',     rc:'var(--tx-ok)'}
+};
+const CL = {high:'Consensus: high value', low:'Consensus: low value', divergent:'Divergent across staff'};
+
+/* ── RENDERING ──────────────────────────────────────────────────────────── */
+function avg(items){ return Math.round(items.reduce((s,i)=>s+i.s,0)/items.length); }
+
+function scoreBar(items){
+  const a = avg(items);
+  const persons = [...new Set(items.map(i=>i.p))];
+  const dots = items.map(i=>`<div class="sdot" style="left:${i.s}%;background:${PC[i.p]};" title="${i.p}: ${i.l} (${i.s})"></div>`).join('');
+  const leg  = persons.map(p=>`<span class="li"><span class="ldot" style="background:${PC[p]};"></span>${p}</span>`).join('');
+  return `<div class="strack"><div class="sbg"></div><div class="savg" style="left:${a}%;"></div>${dots}</div>
+    <div class="slbls"><span>least valued</span><span>avg: ${a}</span><span>most valued</span></div>
+    <div class="legend">${leg}</div>`;
+}
+
+function render(filter){
+  const list = document.getElementById('clist');
+  const show = filter==='all' ? CLUSTERS : CLUSTERS.filter(c=>c.action===filter);
+  list.innerHTML = show.map(c=>{
+    const s  = AS[c.action];
+    const a  = avg(c.items);
+    const rows = c.items.map(i=>`<div class="pr"><span class="ptag" style="background:${PC[i.p]};">${i.p}</span><span style="flex:1;">${i.l}</span><span class="psc">${i.s}</span></div>`).join('');
+    const fws  = c.fw.map(f=>`<span class="fwt">${f}</span>`).join('');
+    const ins  = c.ins ? `<div class="ins"><i class="ti ti-alert-triangle" aria-hidden="true"></i>&nbsp; ${c.ins}</div>` : '';
+    return `<div class="cc" data-action="${c.action}">
+      <div class="ch" onclick="tog('${c.id}')">
+        <div class="cbar" style="background:${s.bar};"></div>
+        <div class="hc">
+          <div class="htop">
+            <span class="badge" style="background:${s.bbg};color:${s.bc};">${s.label}</span>
+            <span class="clbl">${CL[c.con]}</span>
+          </div>
+          <div class="cname">${c.name}</div>
+          <div class="cdesc">${c.desc}</div>
+        </div>
+        <div class="hr">
+          <div><div class="asc">${a}</div><div class="albl">avg</div></div>
+          <span class="tic" id="ti-${c.id}">+</span>
+        </div>
+      </div>
+      <div class="cb" id="cb-${c.id}">
+        ${scoreBar(c.items)}
+        <div class="plist">${rows}</div>
+        ${ins}
+        <div class="fwtags">${fws}</div>
+        <div class="reco" style="background:${s.rb};">
+          <div class="rlbl" style="color:${s.rc};">Recommended action</div>
+          <span>${c.reco}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(id){
+  const b = document.getElementById('cb-'+id);
+  const t = document.getElementById('ti-'+id);
+  const o = b.classList.toggle('open');
+  t.textContent = o ? '−' : '+';
+}
+
+function go(filter, btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render(filter);
+}
+
+render('all');
+</script>
+</body>
+</html>
